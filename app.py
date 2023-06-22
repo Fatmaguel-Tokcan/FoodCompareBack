@@ -1,10 +1,15 @@
 from flask import Flask, request, jsonify
 import pandas as pd
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 
-df = pd.read_csv('static/data/RAW_recipes.csv')
+CORS(app, resources={r"/": {"origins": "http://localhost:8081", "headers": "", "methods": "*"}})
+
+
+df = pd.read_csv('RAW_recipes.csv')
 print(df.head())
+
 
 @app.route('/gericht', methods=['GET'])
 def get_gericht():
@@ -36,5 +41,5 @@ def get_zutaten():
     zutaten = zutaten_data.split(',')
     return jsonify(zutaten)
 
-if __name__ == '__main__':
-    app.run(debug=True) 
+if __name__ == '_main_':
+    app.run(debug=True)
