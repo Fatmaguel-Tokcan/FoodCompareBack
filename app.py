@@ -37,110 +37,40 @@ if 'checked_ingredients' not in st.session_state:
     st.session_state.checked_ingredients = []  # Initialize the variable here
 
 if navigation == 'Home':
-    st.title('Welcome to Healthy Recipes!')
-    st.write('This is a website designed to help you protect your health by finding nutritious recipes.')
-    st.write('You can explore a variety of healthy recipes, view their nutrition information, and even check your BMI.')
+    st.title('Welcome to Plan your Meal!')
+    st.write('Here you can find recipes and create an individual weekly plan. You can also determine your BMI and search for recipes based on ingredients. Then have a shopping list generated for you.')
+
     st.header('Home')
 
-# Add buttons for navigation
-col1, col2, col3, col4, col5, col6 = st.columns(6)
-button_width = 100  # Set the width for all buttons
+    # Add buttons for navigation
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    with col1:
+        if st.button('Weekly Meal Plan'):
+            navigation = 'Weekly Meal Plan'
+    with col2:
+        if st.button('BMI'):
+            navigation = 'BMI'
+    with col3:
+        if st.button('Recipes'):
+            navigation = 'Recipes'
+    with col4:
+        if st.button('Search Ingredients'):
+            navigation = 'Search Ingredients'
+    with col5:
+        if st.button('Recipe Details'):
+            navigation = 'Recipe Details'
+    with col6:
+        if st.button('Shopping List'):
+            navigation = 'Shopping List'
 
+# Füge die Bilder nebeneinander hinzu
+col1, col2, col3 = st.columns(3)
 with col1:
-    st.write(
-        """
-        <style>
-        .custom-button-green {
-            width: 100%;
-            background-color: green;
-            color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    if st.button('Weekly Meal Plan', key='weekly_meal_plan_button', help='Weekly Meal Plan', args={'class': 'custom-button-green'}):
-        navigation = 'Weekly Meal Plan'
-
+    st.image('/Users/sedadelikaya/Desktop/4. Semester/Unternehmensoftware/FoodCompareBack/amerikanische-pancakes.jpg', use_column_width=True, caption='Amerikanische Pancakes')
 with col2:
-    st.write(
-        """
-        <style>
-        .custom-button-green {
-            width: 100%;
-            background-color: green;
-            color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    if st.button('BMI', key='bmi_button', help='BMI', args={'class': 'custom-button-green'}):
-        navigation = 'BMI'
-
+    st.image('/Users/sedadelikaya/Desktop/4. Semester/Unternehmensoftware/FoodCompareBack/Teriyaki-chicken-bowls-8.jpg', use_column_width=True, caption='Teriyaki Chicken Bowls')
 with col3:
-    st.write(
-        """
-        <style>
-        .custom-button-green {
-            width: 100%;
-            background-color: green;
-            color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    if st.button('Recipes', key='recipes_button', help='Recipes', args={'class': 'custom-button-green'}):
-        navigation = 'Recipes'
-
-with col4:
-    st.write(
-        """
-        <style>
-        .custom-button-green {
-            width: 100%;
-            background-color: green;
-            color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    if st.button('Search Ingredients', key='search_ingredients_button', help='Search Ingredients', args={'class': 'custom-button-green'}):
-        navigation = 'Search Ingredients'
-
-with col5:
-    st.write(
-        """
-        <style>
-        .custom-button-green {
-            width: 100%;
-            background-color: green;
-            color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    if st.button('Recipe Details', key='recipe_details_button', help='Recipe Details', args={'class': 'custom-button-green'}):
-        navigation = 'Recipe Details'
-
-with col6:
-    st.write(
-        """
-        <style>
-        .custom-button-green {
-            width: 100%;
-            background-color: green;
-            color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    if st.button('Shopping List', key='shopping_list_button', help='Shopping List', args={'class': 'custom-button-green'}):
-        navigation = 'Shopping List'
+    st.image('/Users/sedadelikaya/Desktop/4. Semester/Unternehmensoftware/FoodCompareBack/Vanilla-Peanut-Butter-and-Banana-Ice-Cream.600-500x500.jpg', use_column_width=True, caption='Vanilla Peanut Butter and Banana Ice Cream')
 
 
 if navigation == 'BMI':
@@ -166,11 +96,7 @@ if navigation == 'Recipes':
     page = st.number_input('Page', min_value=1, step=1, value=1)
     start_idx = (page - 1) * 100
     end_idx = start_idx + 100
-    recipes_df = df.iloc[start_idx:end_idx]
-    selected_recipe = st.selectbox('Select a recipe:', [''] + recipes_df['name'].tolist())
-    if selected_recipe:
-        navigation = 'Recipe Details'
-        name = selected_recipe
+    st.dataframe(df.iloc[start_idx:end_idx])
 
 if navigation == 'Search Ingredients':
     st.header('Search Ingredients')
@@ -184,17 +110,19 @@ if navigation == 'Search Ingredients':
 
 if navigation == 'Recipe Details':
     st.header('Recipe Details')
-    recipe = get_recipe_data(name)
-    if recipe is None:
-        st.write('Recipe not found.')
-    else:
-        st.write('Name:', recipe['name'])
-        st.write('Minutes:', recipe['minutes'])
-        st.write('Tags:', recipe['tags'])
-        st.write('Nutrition:', recipe['nutrition'])
-        st.write('Steps:', recipe['steps'])
-        st.write('Description:', recipe['description'])
-        st.write('Ingredients:', recipe['ingredients'])
+    name = st.text_input('Enter the recipe name:')
+    if name:
+        recipe = get_recipe_data(name)
+        if recipe is None:
+            st.write('Recipe not found.')
+        else:
+            st.write('Name:', recipe['name'])
+            st.write('Minutes:', recipe['minutes'])
+            st.write('Tags:', recipe['tags'])
+            st.write('Nutrition:', recipe['nutrition'])
+            st.write('Steps:', recipe['steps'])
+            st.write('Description:', recipe['description'])
+            st.write('Ingredients:', recipe['ingredients'])
 
 if navigation == 'Shopping List':
     st.header('Shopping List')
@@ -208,6 +136,66 @@ if navigation == 'Shopping List':
                 ingredients_list.extend(ingredients.split(','))
         ingredients_list = [ingredient.strip() for ingredient in ingredients_list]
         ingredients_list = list(set(ingredients_list))  # Remove duplicates
-        checked_ingredients = st.multiselect('Select ingredients:', ingredients_list, default=st.session_state.checked_ingredients)
-        st.session_state.checked_ingredients = checked_ingredients
-        st.write('Checked Ingredients:', checked_ingredients)
+        checked_ingredients = st.multiselect('Check off ingredients:', ingredients_list, format_func=lambda x: f"[x] {x}" if x in st.session_state.checked_ingredients else f"[ ] {x}")
+        st.write('Generated Shopping List:')
+        for ingredient in ingredients_list:
+            if ingredient in checked_ingredients:
+                st.write('- [x] ' + ingredient)
+            else:
+                st.write('- [ ] ' + ingredient)
+    else:
+        st.write('No recipes selected. Please choose at least one recipe to generate the shopping list.')
+
+if navigation == 'Weekly Meal Plan':
+    st.header('Weekly Meal Plan')
+    days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    selected_recipes = {}
+    for day in days_of_week:
+        recipe_name = st.selectbox(f'Select a recipe for {day}:', [''] + df['name'].tolist(), key=f'recipe_{day}')
+        selected_recipes[day] = recipe_name
+    st.write('Selected Recipes:')
+    for day, recipe_name in selected_recipes.items():
+        st.subheader(day)
+        if recipe_name:
+            recipe = get_recipe_data(recipe_name)
+            if recipe is None:
+                st.write('Recipe not found.')
+            else:
+                st.write('Name:', recipe['name'])
+                st.write('Minutes:', recipe['minutes'])
+                st.write('Tags:', recipe['tags'])
+                st.write('Nutrition:', recipe['nutrition'])
+                st.write('Steps:', recipe['steps'])
+                st.write('Description:', recipe['description'])
+                st.write('Ingredients:', recipe['ingredients'])
+        else:
+            st.write('No recipe selected for this day.')
+
+# Custom CSS styles
+st.write(
+    """
+    <style>
+    body {
+        background-color: #c6e6c6;
+    }
+    .stButton button.custom-button-green {
+        background-color: green;
+        color: white;
+    }
+    .stTextInput>div>div>input {
+        background-color: #c6e6c6;
+        border-color: green;
+        color: green;
+    }
+    .stNumberInput>div>div>input {
+        background-color: #c6e6c6;
+        border-color: green;
+        color: green;
+    }
+    .stDataFrame>div>div>div>div>table {
+        background-color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
