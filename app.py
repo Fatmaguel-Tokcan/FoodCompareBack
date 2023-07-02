@@ -42,26 +42,106 @@ if navigation == 'Home':
     st.write('You can explore a variety of healthy recipes, view their nutrition information, and even check your BMI.')
     st.header('Home')
 
-    # Add buttons for navigation
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
-    with col1:
-        if st.button('Weekly Meal Plan'):
-            navigation = 'Weekly Meal Plan'
-    with col2:
-        if st.button('BMI'):
-            navigation = 'BMI'
-    with col3:
-        if st.button('Recipes'):
-            navigation = 'Recipes'
-    with col4:
-        if st.button('Search Ingredients'):
-            navigation = 'Search Ingredients'
-    with col5:
-        if st.button('Recipe Details'):
-            navigation = 'Recipe Details'
-    with col6:
-        if st.button('Shopping List'):
-            navigation = 'Shopping List'
+# Add buttons for navigation
+col1, col2, col3, col4, col5, col6 = st.columns(6)
+button_width = 100  # Set the width for all buttons
+
+with col1:
+    st.write(
+        """
+        <style>
+        .custom-button-green {
+            width: 100%;
+            background-color: green;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button('Weekly Meal Plan', key='weekly_meal_plan_button', help='Weekly Meal Plan', args={'class': 'custom-button-green'}):
+        navigation = 'Weekly Meal Plan'
+
+with col2:
+    st.write(
+        """
+        <style>
+        .custom-button-green {
+            width: 100%;
+            background-color: green;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button('BMI', key='bmi_button', help='BMI', args={'class': 'custom-button-green'}):
+        navigation = 'BMI'
+
+with col3:
+    st.write(
+        """
+        <style>
+        .custom-button-green {
+            width: 100%;
+            background-color: green;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button('Recipes', key='recipes_button', help='Recipes', args={'class': 'custom-button-green'}):
+        navigation = 'Recipes'
+
+with col4:
+    st.write(
+        """
+        <style>
+        .custom-button-green {
+            width: 100%;
+            background-color: green;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button('Search Ingredients', key='search_ingredients_button', help='Search Ingredients', args={'class': 'custom-button-green'}):
+        navigation = 'Search Ingredients'
+
+with col5:
+    st.write(
+        """
+        <style>
+        .custom-button-green {
+            width: 100%;
+            background-color: green;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button('Recipe Details', key='recipe_details_button', help='Recipe Details', args={'class': 'custom-button-green'}):
+        navigation = 'Recipe Details'
+
+with col6:
+    st.write(
+        """
+        <style>
+        .custom-button-green {
+            width: 100%;
+            background-color: green;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button('Shopping List', key='shopping_list_button', help='Shopping List', args={'class': 'custom-button-green'}):
+        navigation = 'Shopping List'
+
 
 if navigation == 'BMI':
     st.header('BMI Calculator')
@@ -86,7 +166,11 @@ if navigation == 'Recipes':
     page = st.number_input('Page', min_value=1, step=1, value=1)
     start_idx = (page - 1) * 100
     end_idx = start_idx + 100
-    st.dataframe(df.iloc[start_idx:end_idx])
+    recipes_df = df.iloc[start_idx:end_idx]
+    selected_recipe = st.selectbox('Select a recipe:', [''] + recipes_df['name'].tolist())
+    if selected_recipe:
+        navigation = 'Recipe Details'
+        name = selected_recipe
 
 if navigation == 'Search Ingredients':
     st.header('Search Ingredients')
@@ -100,19 +184,17 @@ if navigation == 'Search Ingredients':
 
 if navigation == 'Recipe Details':
     st.header('Recipe Details')
-    name = st.text_input('Enter the recipe name:')
-    if name:
-        recipe = get_recipe_data(name)
-        if recipe is None:
-            st.write('Recipe not found.')
-        else:
-            st.write('Name:', recipe['name'])
-            st.write('Minutes:', recipe['minutes'])
-            st.write('Tags:', recipe['tags'])
-            st.write('Nutrition:', recipe['nutrition'])
-            st.write('Steps:', recipe['steps'])
-            st.write('Description:', recipe['description'])
-            st.write('Ingredients:', recipe['ingredients'])
+    recipe = get_recipe_data(name)
+    if recipe is None:
+        st.write('Recipe not found.')
+    else:
+        st.write('Name:', recipe['name'])
+        st.write('Minutes:', recipe['minutes'])
+        st.write('Tags:', recipe['tags'])
+        st.write('Nutrition:', recipe['nutrition'])
+        st.write('Steps:', recipe['steps'])
+        st.write('Description:', recipe['description'])
+        st.write('Ingredients:', recipe['ingredients'])
 
 if navigation == 'Shopping List':
     st.header('Shopping List')
@@ -126,21 +208,6 @@ if navigation == 'Shopping List':
                 ingredients_list.extend(ingredients.split(','))
         ingredients_list = [ingredient.strip() for ingredient in ingredients_list]
         ingredients_list = list(set(ingredients_list))  # Remove duplicates
-        checked_ingredients = st.multiselect('Check off ingredients:', ingredients_list, format_func=lambda x: f"[x] {x}" if x in st.session_state.checked_ingredients else f"[ ] {x}")
-        st.write('Generated Shopping List:')
-        for ingredient in ingredients_list:
-            if ingredient in checked_ingredients:
-                st.write('- [x] ' + ingredient)
-            else:
-                st.write('- [ ] ' + ingredient)
-    else:
-        st.write('No recipes selected. Please choose at least one recipe to generate the shopping list.')
-
-if navigation == 'Weekly Meal Plan':
-    st.header('Weekly Meal Plan')
-    st.write('Select a recipe for each day of the week:')
-    selected_recipes = []
-    for day in range(7):
-        recipe_name = st.selectbox(f'Day {day+1}', [''] + df['name'].tolist(), key=f'recipe_{day}')
-        selected_recipes.append(recipe_name)
-    st.write('Selected Recipes:', selected_recipes)
+        checked_ingredients = st.multiselect('Select ingredients:', ingredients_list, default=st.session_state.checked_ingredients)
+        st.session_state.checked_ingredients = checked_ingredients
+        st.write('Checked Ingredients:', checked_ingredients)
