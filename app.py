@@ -96,7 +96,26 @@ if navigation == 'Recipes':
     page = st.number_input('Page', min_value=1, step=1, value=1)
     start_idx = (page - 1) * 100
     end_idx = start_idx + 100
-    st.dataframe(df.iloc[start_idx:end_idx])
+    recipes = df.iloc[start_idx:end_idx]
+
+    selected_recipe = st.selectbox('Select a recipe:', recipes['name'].tolist())
+
+    if selected_recipe:
+        recipe_details_expander = st.expander('Recipe Details', expanded=True)
+        with recipe_details_expander:
+            recipe = get_recipe_data(selected_recipe)
+            if recipe is None:
+                st.write('Recipe not found.')
+            else:
+                st.write('Name:', recipe['name'])
+                st.write('Minutes:', recipe['minutes'])
+                st.write('Tags:', recipe['tags'])
+                st.write('Nutrition:', recipe['nutrition'])
+                st.write('Steps:', recipe['steps'])
+                st.write('Description:', recipe['description'])
+                st.write('Ingredients:', recipe['ingredients'])
+
+    st.dataframe(recipes)
 
 if navigation == 'Search Ingredients':
     st.header('Search Ingredients')
