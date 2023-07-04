@@ -29,6 +29,10 @@ def calculate_bmi(weight, height):
     bmi = weight / (height ** 2)
     return bmi
 
+name = None
+
+
+
 # Add a navbar
 st.sidebar.title('Navigation')
 navigation = st.sidebar.radio('Go to', ('Home', 'Weekly Meal Plan', 'BMI', 'Recipes', 'Search Ingredients', 'Recipe Details', 'Shopping List'))
@@ -36,11 +40,16 @@ navigation = st.sidebar.radio('Go to', ('Home', 'Weekly Meal Plan', 'BMI', 'Reci
 if 'checked_ingredients' not in st.session_state:
     st.session_state.checked_ingredients = []  # Initialize the variable here
 
+if 'username' not in st.session_state:
+    st.session_state.username = ''
+
 if navigation == 'Home':
     st.title('Welcome to Plan your Meal!')
     st.write('Here you can find recipes and create an individual weekly plan. You can also determine your BMI and search for recipes based on ingredients. Then have a shopping list generated for you.')
 
     st.header('Home')
+
+    st.text_input('Please enter your name ', key='username')
 
     # Add buttons for navigation
     col1, col2, col3, col4, col5, col6 = st.columns(6)
@@ -66,15 +75,22 @@ if navigation == 'Home':
 # Füge die Bilder nebeneinander hinzu
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.image('/Users/sedadelikaya/Desktop/4. Semester/Unternehmensoftware/FoodCompareBack/amerikanische-pancakes.jpg', use_column_width=True, caption='Amerikanische Pancakes')
+    st.image('amerikanische-pancakes.jpg', use_column_width=True, caption='Amerikanische Pancakes')
 with col2:
-    st.image('/Users/sedadelikaya/Desktop/4. Semester/Unternehmensoftware/FoodCompareBack/Teriyaki-chicken-bowls-8.jpg', use_column_width=True, caption='Teriyaki Chicken Bowls')
+    st.image('Teriyaki-chicken-bowls-8.jpg', use_column_width=True, caption='Teriyaki Chicken Bowls')
 with col3:
-    st.image('/Users/sedadelikaya/Desktop/4. Semester/Unternehmensoftware/FoodCompareBack/Vanilla-Peanut-Butter-and-Banana-Ice-Cream.600-500x500.jpg', use_column_width=True, caption='Vanilla Peanut Butter and Banana Ice Cream')
+    st.image('Vanilla-Peanut-Butter-and-Banana-Ice-Cream.600-500x500.jpg', use_column_width=True, caption='Vanilla Peanut Butter and Banana Ice Cream')
 
 
 if navigation == 'BMI':
-    st.header('BMI Calculator')
+
+
+    if st.session_state.username != '' :
+        st.header('BMI Calculator for '  + st.session_state.username)
+        st.session_state['username'] = st.session_state.username
+    else:
+        st.header('BMI Calculator')
+
     st.write('Please enter your weight and height to calculate your BMI.')
     weight = st.number_input('Weight (in kg)')
     height = st.number_input('Height (in meters)')
@@ -92,33 +108,26 @@ if navigation == 'BMI':
             st.write('Obese')
 
 if navigation == 'Recipes':
-    st.header('Recipes')
+
+    if st.session_state.username !='' :
+        st.header('Recipes for '  + st.session_state.username)
+        st.session_state['username'] = st.session_state.username
+    else:
+        st.header('Recipes')
+
     page = st.number_input('Page', min_value=1, step=1, value=1)
     start_idx = (page - 1) * 100
     end_idx = start_idx + 100
-    recipes = df.iloc[start_idx:end_idx]
-
-    selected_recipe = st.selectbox('Select a recipe:', recipes['name'].tolist())
-
-    if selected_recipe:
-        recipe_details_expander = st.expander('Recipe Details', expanded=True)
-        with recipe_details_expander:
-            recipe = get_recipe_data(selected_recipe)
-            if recipe is None:
-                st.write('Recipe not found.')
-            else:
-                st.write('Name:', recipe['name'])
-                st.write('Minutes:', recipe['minutes'])
-                st.write('Tags:', recipe['tags'])
-                st.write('Nutrition:', recipe['nutrition'])
-                st.write('Steps:', recipe['steps'])
-                st.write('Description:', recipe['description'])
-                st.write('Ingredients:', recipe['ingredients'])
-
-    st.dataframe(recipes)
+    st.dataframe(df.iloc[start_idx:end_idx])
 
 if navigation == 'Search Ingredients':
-    st.header('Search Ingredients')
+
+    if st.session_state.username !='' :
+        st.header('Search Ingredients for '  + st.session_state.username)
+        st.session_state['username'] = st.session_state.username
+    else:
+        st.header('Search Ingredients')
+
     ingredient = st.text_input('Enter an ingredient:')
     if ingredient:
         filtered_data = filter_recipes_by_ingredient(ingredient)
@@ -128,7 +137,15 @@ if navigation == 'Search Ingredients':
             st.dataframe(filtered_data)
 
 if navigation == 'Recipe Details':
-    st.header('Recipe Details')
+
+
+    if st.session_state.username !='' :
+        st.header('Recipe Details for '  + st.session_state.username)
+        st.session_state['username'] = st.session_state.username
+    else:
+        st.header('Recipe Details')
+
+
     name = st.text_input('Enter the recipe name:')
     if name:
         recipe = get_recipe_data(name)
@@ -144,7 +161,13 @@ if navigation == 'Recipe Details':
             st.write('Ingredients:', recipe['ingredients'])
 
 if navigation == 'Shopping List':
-    st.header('Shopping List')
+
+    if st.session_state.username != '':
+        st.header('Shopping List for '  + st.session_state.username)
+        st.session_state['username'] = st.session_state.username
+    else:
+        st.header('Shopping List')
+
     selected_recipes = st.multiselect('Select recipes:', df['name'].tolist())
     if selected_recipes:
         ingredients_list = []
@@ -166,7 +189,14 @@ if navigation == 'Shopping List':
         st.write('No recipes selected. Please choose at least one recipe to generate the shopping list.')
 
 if navigation == 'Weekly Meal Plan':
-    st.header('Weekly Meal Plan')
+
+
+    if st.session_state.username != '' :
+        st.header('Weekly Meal Plan for '  + st.session_state.username)
+        st.session_state['username'] = st.session_state.username
+    else:
+        st.header('Weekly Meal Plan')
+
     days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     selected_recipes = {}
     for day in days_of_week:
