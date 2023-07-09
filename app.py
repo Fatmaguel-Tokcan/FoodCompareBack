@@ -162,13 +162,7 @@ if navigation == 'Recipe Details':
             st.write('Ingredients:', recipe['ingredients'])
 
 if navigation == 'Shopping List':
-
-    if st.session_state.username != '':
-        st.header('Shopping List for '  + st.session_state.username)
-        st.session_state['username'] = st.session_state.username
-    else:
-        st.header('Shopping List')
-
+    st.header('Shopping List')
     selected_recipes = st.multiselect('Select recipes:', df['name'].tolist())
     if selected_recipes:
         ingredients_list = []
@@ -188,7 +182,6 @@ if navigation == 'Shopping List':
                 st.write('- [ ] ' + ingredient)
     else:
         st.write('No recipes selected. Please choose at least one recipe to generate the shopping list.')
-
 if navigation == 'Weekly Meal Plan':
 
 
