@@ -22,21 +22,7 @@ def get_recipe_data(name):
 
     return recipe
 
-def filter_recipes_by_ingredient(ingredient):
-    filtered_data = df[df['ingredients'].str.contains(ingredient, case=False, na=False)]
-    return filtered_data
-
-def calculate_bmi(weight, height):
-    bmi = weight / (height ** 2)
-    return bmi
-
 name = None
-
-
-
-# Add a navbar
-st.sidebar.title('Navigation')
-navigation = st.sidebar.radio('Go to', ('Home', 'Weekly Meal Plan', 'BMI', 'Recipes', 'Search Ingredients', 'Recipe Details', 'Shopping List'))
 
 if 'checked_ingredients' not in st.session_state:
     st.session_state.checked_ingredients = []  # Initialize the variable here
@@ -44,53 +30,41 @@ if 'checked_ingredients' not in st.session_state:
 if 'username' not in st.session_state:
     st.session_state.username = ''
 
-if navigation == 'Home':
-    st.title('Welcome to Plan your Meal!')
-    st.write('Here you can find recipes and create an individual weekly plan. You can also determine your BMI and search for recipes based on ingredients. Then have a shopping list generated for you.')
+# Add navbar
+navigation = option_menu('Navigation', options=['Home', 'BMI', 'Recipes', 'Search Ingredients', 'Shopping List'], orientation="horizontal")
 
-    st.header('Home')
+# Use Streamlit container to stretch the navbar
+with st.container():
+    st.write('')
+    st.write('')
+    st.write(navigation)
 
-    st.text_input('Please enter your name ', key='username')
+# Rest of the code
+st.write('Here you can find recipes and create an individual weekly plan. You can also determine your BMI and search for recipes based on ingredients. Then have a shopping list generated for you.')
 
-    # Add buttons for navigation
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
-    with col1:
-        if st.button('Weekly Meal Plan'):
-            navigation = 'Weekly Meal Plan'
-    with col2:
-        if st.button('BMI'):
-            navigation = 'BMI'
-    with col3:
-        if st.button('Recipes'):
-            navigation = 'Recipes'
-    with col4:
-        if st.button('Search Ingredients'):
-            navigation = 'Search Ingredients'
-    with col5:
-        if st.button('Recipe Details'):
-            navigation = 'Recipe Details'
-    with col6:
-        if st.button('Shopping List'):
-            navigation = 'Shopping List'
+st.header('Home')
 
-# Füge die Bilder nebeneinander hinzu
+st.text_input('Please enter your name', key='username')
+
+# Display images
+st.subheader('Featured Recipes')
 col1, col2, col3 = st.columns(3)
 with col1:
     st.image('amerikanische-pancakes.jpg', use_column_width=True, caption='Amerikanische Pancakes')
 with col2:
     st.image('Teriyaki-chicken-bowls-8.jpg', use_column_width=True, caption='Teriyaki Chicken Bowls')
 with col3:
-    st.image('Vanilla-Peanut-Butter-and-Banana-Ice-Cream.600-500x500.jpg', use_column_width=True, caption='Vanilla Peanut Butter and Banana Ice Cream')
-
+    st.image('How-To-Make-Banana-Ice-Cream-071220172061.jpg.webp', use_column_width=True, caption='Banana Ice Cream')
 
 if navigation == 'BMI':
-
-
-    if st.session_state.username != '' :
-        st.header('BMI Calculator for '  + st.session_state.username)
-        st.session_state['username'] = st.session_state.username
+    if st.session_state.username != '':
+        st.header(f'BMI Calculator for {st.session_state.username}')
     else:
         st.header('BMI Calculator')
+
+    def calculate_bmi(weight, height):
+        bmi = weight / (height ** 2)
+        return round(bmi, 2)
 
     st.write('Please enter your weight and height to calculate your BMI.')
     weight = st.number_input('Weight (in kg)')
@@ -103,16 +77,10 @@ if navigation == 'BMI':
             st.write('Underweight')
         elif 18.5 <= bmi < 25:
             st.write('Normal weight')
-        elif 25 <= bmi < 30:
-            st.write('Overweight')
-        else:
-            st.write('Obese')
 
 if navigation == 'Recipes':
-
-    if st.session_state.username !='' :
-        st.header('Recipes for '  + st.session_state.username)
-        st.session_state['username'] = st.session_state.username
+    if st.session_state.username != '':
+        st.header(f'Recipes for {st.session_state.username}')
     else:
         st.header('Recipes')
 
@@ -122,44 +90,15 @@ if navigation == 'Recipes':
     st.dataframe(df.iloc[start_idx:end_idx])
 
 if navigation == 'Search Ingredients':
-
-    if st.session_state.username !='' :
-        st.header('Search Ingredients for '  + st.session_state.username)
-        st.session_state['username'] = st.session_state.username
+    if st.session_state.username != '':
+        st.header(f'Search Ingredients for {st.session_state.username}')
     else:
         st.header('Search Ingredients')
 
-    ingredient = st.text_input('Enter an ingredient:')
-    if ingredient:
+    ingredient = st.text_input('Enter an ingredient')
+    if st.button('Search'):
         filtered_data = filter_recipes_by_ingredient(ingredient)
-        if filtered_data.empty:
-            st.write('No recipes found with this ingredient.')
-        else:
-            st.dataframe(filtered_data)
-
-if navigation == 'Recipe Details':
-
-
-    if st.session_state.username !='' :
-        st.header('Recipe Details for '  + st.session_state.username)
-        st.session_state['username'] = st.session_state.username
-    else:
-        st.header('Recipe Details')
-
-
-    name = st.text_input('Enter the recipe name:')
-    if name:
-        recipe = get_recipe_data(name)
-        if recipe is None:
-            st.write('Recipe not found.')
-        else:
-            st.write('Name:', recipe['name'])
-            st.write('Minutes:', recipe['minutes'])
-            st.write('Tags:', recipe['tags'])
-            st.write('Nutrition:', recipe['nutrition'])
-            st.write('Steps:', recipe['steps'])
-            st.write('Description:', recipe['description'])
-            st.write('Ingredients:', recipe['ingredients'])
+        st.dataframe(filtered_data)
 
 if navigation == 'Shopping List':
     st.header('Shopping List')
@@ -214,31 +153,42 @@ if navigation == 'Weekly Meal Plan':
         else:
             st.write('No recipe selected for this day.')
 
-# Custom CSS styles
-st.write(
+# Add feedback button at the bottom of the page
+st.markdown(
     """
     <style>
-    body {
-        background-color: #c6e6c6;
+    .feedback-btn-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
     }
-    .stButton button.custom-button-green {
-        background-color: green;
+    .feedback-btn-container button {
+        background-color: blue;
         color: white;
-    }
-    .stTextInput>div>div>input {
-        background-color: #c6e6c6;
-        border-color: green;
-        color: green;
-    }
-    .stNumberInput>div>div>input {
-        background-color: #c6e6c6;
-        border-color: green;
-        color: green;
-    }
-    .stDataFrame>div>div>div>div>table {
-        background-color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
     }
     </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    """
+    <div class="feedback-btn-container">
+        <button onclick="document.getElementById('feedback-modal').style.display = 'block'"">Feedback</button>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# Add feedback modal
+st.markdown(
+    """
+    <div class="feedback-btn-container">
+        <button onclick="document.getElementById('feedback-modal').style.display = 'block'"">Feedback</button>
+    </div>
     """,
     unsafe_allow_html=True
 )
